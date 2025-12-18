@@ -145,14 +145,15 @@ async def train_api(file: UploadFile = File(...)):
 
 class CarFeatures(BaseModel):
     vehicle_age: int
-    kilometers_driven: int
+    km_driven: int
     seller_type: str
     fuel_type: str
-    transmission: str
+    transmission_type: str
     mileage: float
     engine: int
     max_power: float
     seats: int
+
 
 
 @app.post("/predict")
@@ -168,7 +169,9 @@ def predict(features: CarFeatures):
         prediction = model.predict(df)[0]
         return {"predicted_price": prediction}
     except Exception as e:
+        print("Prediction error:", e)
         raise HTTPException(status_code=400, detail=str(e))
+
 # ---------------------------
 # GET CAR DETAILS FOR FRONTEND DROPDOWNS
 # ---------------------------
