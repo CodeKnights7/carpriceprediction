@@ -143,7 +143,12 @@ async def train_api(file: UploadFile = File(...)):
         raise HTTPException(status_code=400, detail=str(e))
 
 
+# ---------------------------
+# CORRECT FEATURE MODEL
+# Must match CSV header exactly
+# ---------------------------
 class CarFeatures(BaseModel):
+    model: str
     vehicle_age: int
     km_driven: int
     seller_type: str
@@ -153,7 +158,6 @@ class CarFeatures(BaseModel):
     engine: int
     max_power: float
     seats: int
-
 
 
 @app.post("/predict")
@@ -167,20 +171,18 @@ def predict(features: CarFeatures):
 
     try:
         prediction = model.predict(df)[0]
-        return {"predicted_price": prediction}
+        return {"predicted_price": float(prediction)}
     except Exception as e:
         print("Prediction error:", e)
         raise HTTPException(status_code=400, detail=str(e))
+
 
 # ---------------------------
 # GET CAR DETAILS FOR FRONTEND DROPDOWNS
 # ---------------------------
 @app.get("/get")
 def get_car_info():
-    """
-    Returns all unique dropdown values from CSV file.
-    Helps frontend populate car model, fuel, seller, etc.
-    """
+
     if not os.path.exists(TRAIN_DATASET):
         raise HTTPException(status_code=404, detail="car dataset not found")
 
@@ -192,7 +194,7 @@ def get_car_info():
             "models": sorted(df["model"].dropna().unique().tolist()),
             "fuel_types": sorted(df["fuel_type"].dropna().unique().tolist()),
             "seller_types": sorted(df["seller_type"].dropna().unique().tolist()),
-            "transmissions": sorted(df["transmission"].dropna().unique().tolist()),
+            "transmissions": sorted(df["transmission_type"].dropna().unique().tolist()),
             "seats": sorted(df["seats"].dropna().unique().tolist()),
             "min_vehicle_age": int(df["vehicle_age"].min()),
             "max_vehicle_age": int(df["vehicle_age"].max()),
