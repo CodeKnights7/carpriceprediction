@@ -11,8 +11,20 @@ from sklearn.pipeline import Pipeline
 from sklearn.metrics import mean_absolute_error, r2_score
 import io
 import os
+from fastapi.middleware.cors import CORSMiddleware
+
 
 app = FastAPI(title="Car Price Predictor API")
+# ------------------------------------
+# CORS Setup (Allow All Frontend Apps)
+# ------------------------------------
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],          # Allow ALL frontend URLs
+    allow_credentials=True,
+    allow_methods=["*"],          # GET, POST, PUT, DELETE, OPTIONS
+    allow_headers=["*"],          # Authorization, Content-Type, etc.
+)
 
 MODEL_PATH = "car_price_model.pkl"
 
